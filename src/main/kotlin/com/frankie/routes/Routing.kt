@@ -13,7 +13,7 @@ import io.ktor.server.routing.*
  * Configures routing for the Ktor application.
  * This includes handling endpoints and error pages.
  */
-fun Application.configureRouting() {
+fun Application.configureRouting(pokemonService: PokemonService = PokemonService(httpClient)) {
     install(StatusPages) {
         exception<IllegalStateException> { call, cause ->
             call.respondText("App in illegal state as ${cause.message}")
@@ -28,12 +28,11 @@ fun Application.configureRouting() {
                 "Missing name",
                 status = HttpStatusCode.BadRequest
             )
-            val service = PokemonService(httpClient)
 
             try {
-                val apiResult = service.getPokemon(name)
+                val apiResult = pokemonService.getPokemon(name)
                 val response = apiResult.toPokemonResponse()
-                call.respond(response)
+                call.respond(HttpStatusCode.OK, response)
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.NotFound, "Pokemon not found")
             }
