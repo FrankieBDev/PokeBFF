@@ -1,8 +1,7 @@
 package com.frankie
 
 //import com.frankie.com.frankie.plugins.configureMonitoring
-import com.frankie.com.frankie.plugins.configureRouting
-import com.frankie.com.frankie.plugins.configureSerialization
+import com.frankie.routes.configureRouting
 import io.ktor.server.application.*
 
 fun main(args: Array<String>) {
@@ -10,7 +9,5 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    configureSerialization()
-//    configureMonitoring()
     configureRouting()
 }
