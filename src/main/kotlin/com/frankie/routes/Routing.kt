@@ -1,5 +1,6 @@
 package com.frankie.routes
 
+import com.frankie.models.toPokemonResponse
 import com.frankie.services.PokemonService
 import com.frankie.services.httpClient
 import io.ktor.http.*
@@ -28,8 +29,14 @@ fun Application.configureRouting() {
                 status = HttpStatusCode.BadRequest
             )
             val service = PokemonService(httpClient)
-            val pokemon = service.getPokemon(name)
-            call.respond(HttpStatusCode.OK, pokemon)
+
+            try {
+                val apiResult = service.getPokemon(name)
+                val response = apiResult.toPokemonResponse()
+                call.respond(response)
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.NotFound, "Pokemon not found")
+            }
         }
     }
 }
