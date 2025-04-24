@@ -3,7 +3,9 @@ package com.frankie.services
 import com.frankie.models.PokemonApiResponse
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 
 /**
@@ -20,8 +22,15 @@ class PokemonService(private val client: HttpClient) {
      * @return Parsed [PokemonApiResponse] object.
      */
     suspend fun getPokemon(name: String): PokemonApiResponse {
-        return client.get("https://pokeapi.co/api/v2/pokemon/$name") {
-            accept(ContentType.Application.Json)
-        }.body()
+        val response = client.get("https://pokeapi.co/api/v2/pokemon/$name")
+
+        if (!response.status.isSuccess()) {
+            val errorBody = response.bodyAsText()
+            throw ClientRequestException(response, errorBody)
+        }
+
+        return response.body()
     }
+
 }
+

@@ -10,10 +10,11 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 /**
- * Configures routing for the Ktor application.
- * This includes handling endpoints and error pages.
+ * Sets up all routing and error handling for the Ktor application.
+ * Includes endpoints for basic health check and Pokémon-related data.
  */
 fun Application.configureRouting(pokemonService: PokemonService = PokemonService(httpClient)) {
+    // Global error handling setup
     install(StatusPages) {
         exception<IllegalStateException> { call, cause ->
             call.respondText("App in illegal state as ${cause.message}")
@@ -21,7 +22,28 @@ fun Application.configureRouting(pokemonService: PokemonService = PokemonService
     }
     routing {
         /**
-         * GET endpoint to fetch Pokémon data by name.
+         * Health check or root endpoint.
+         * Confirms the server is running.
+         */
+        get("/") {
+            call.respondText("PokeBFF is running!", ContentType.Text.Plain)
+        }
+        /**
+         * Mock endpoint that returns a hardcoded list of basic Pokémon data.
+         * This is for initial testing.
+         */
+        get("/pokemon") {
+            val list = listOf(
+                mapOf("name" to "bulbasaur", "url" to "https://pokeapi.co/api/v2/pokemon/1/"),
+                mapOf("name" to "charmander", "url" to "https://pokeapi.co/api/v2/pokemon/4/"),
+                mapOf("name" to "squirtle", "url" to "https://pokeapi.co/api/v2/pokemon/7/")
+            )
+            call.respond(list)
+        }
+
+        /**
+         * Returns detailed information for a specific Pokémon based on its name.
+         * Responds with 400 if name is missing, or 404 if Pokémon is not found.
          */
         get("/pokemon/{name}") {
             val name = call.parameters["name"] ?: return@get call.respondText(
