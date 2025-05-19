@@ -2,10 +2,16 @@ package com.frankie.models
 
 import kotlinx.serialization.Serializable
 
-/**
- * A simplified data model returned to the UI.
- * Includes only the essential fields needed by the frontend.
- */
+@Serializable
+data class PokemonListResponse(
+    val results: List<PokemonResult>
+)
+
+@Serializable
+data class PokemonResult(
+    val name: String,
+    val url: String
+)
 
 @Serializable
 data class PokemonResponse(

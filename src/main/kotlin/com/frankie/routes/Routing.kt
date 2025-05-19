@@ -28,17 +28,31 @@ fun Application.configureRouting(pokemonService: PokemonService = PokemonService
         get("/") {
             call.respondText("PokeBFF is running!", ContentType.Text.Plain)
         }
-        /**
-         * Mock endpoint that returns a hardcoded list of basic Pokémon data.
-         * This is for initial testing.
-         */
+
+        // DELETE WHEN DONE - COMMENTED AS REMINDER TO SELF
+//        /**
+//         * Mock endpoint that returns a hardcoded list of basic Pokémon data.
+//         * This is for initial testing.
+//         */
+//        get("/pokemon") {
+//            val list = listOf(
+//                mapOf("name" to "bulbasaur", "url" to "https://pokeapi.co/api/v2/pokemon/1/"),
+//                mapOf("name" to "charmander", "url" to "https://pokeapi.co/api/v2/pokemon/4/"),
+//                mapOf("name" to "squirtle", "url" to "https://pokeapi.co/api/v2/pokemon/7/")
+//            )
+//            call.respond(list)
+//        }
+
         get("/pokemon") {
-            val list = listOf(
-                mapOf("name" to "bulbasaur", "url" to "https://pokeapi.co/api/v2/pokemon/1/"),
-                mapOf("name" to "charmander", "url" to "https://pokeapi.co/api/v2/pokemon/4/"),
-                mapOf("name" to "squirtle", "url" to "https://pokeapi.co/api/v2/pokemon/7/")
-            )
-            call.respond(list)
+            val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 20
+            val offset = call.request.queryParameters["offset"]?.toIntOrNull() ?: 0
+
+            try {
+                val response = pokemonService.getPokemonList(limit = limit, offset = offset)
+                call.respond(HttpStatusCode.OK, response)
+            } catch (exception: Exception) {
+                call.respond(HttpStatusCode.BadRequest, exception.message ?: "Failed to fetch Pokemon List")
+            }
         }
 
         /**
