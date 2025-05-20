@@ -1,6 +1,7 @@
 package com.frankie.services
 
 import com.frankie.models.PokemonApiResponse
+import com.frankie.models.PokemonDetailResponse
 import com.frankie.models.PokemonListResponse
 import com.frankie.models.PokemonResponse
 import com.frankie.models.toPokemonResponse
@@ -34,6 +35,17 @@ class PokemonService(private val client: HttpClient) {
             val detail = getPokemon(pokemonResult.name)
             detail.toPokemonResponse()
         }
+    }
+
+    suspend fun getPokemonDetail(name: String): PokemonDetailResponse {
+        val response = client.get("https://pokeapi.co/api/v2/pokemon/$name")
+
+        if (!response.status.isSuccess()) {
+            val errorBody = response.bodyAsText()
+            throw ClientRequestException(response, errorBody)
+
+        }
+        return response.body()
     }
 
 
